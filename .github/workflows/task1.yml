@@ -1,0 +1,21 @@
+name: "Автотесты: Задача 1"
+
+on:
+  push:
+    paths:
+      - 'task1/**/*'
+
+jobs:
+  task1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Подготовка окружения (Docker BuildX)
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Обновление базового образа
+      run: docker pull node:16-alpine
+    - name: Сборка образа 
+      run: docker build . -t task1
+      working-directory: ./task1
+    - name: Проверка базового образа
+      run: bash .github/tests/check-base-image.sh node:16-alpine task1:latest

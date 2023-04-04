@@ -1,0 +1,25 @@
+name: "Автотесты: Задача 3"
+
+on:
+  push:
+    paths:
+      - 'task3/**/*'
+
+jobs:
+  task3:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Подготовка окружения (Docker BuildX)
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Сборка образа 
+      run: docker build . -t task3
+      working-directory: ./task3
+    - name: Проверка рабочей директории
+      run: bash .github/tests/test-workdir.sh /home/ilovedocker/app task3
+    - name: Проверка энтрипоинта образа
+      run: bash .github/tests/test-entrypoint.sh "[node main.js]" task3
+    - name: Запуск контейнера
+      run: docker run -d -p3032:3032 task3 & sleep 5
+    - name: Проверка ответа сервиса
+      run: bash .github/tests/test-http.sh http://localhost:3032 "Привет от API сервиса задачи 3!"
